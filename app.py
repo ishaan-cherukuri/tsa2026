@@ -15,7 +15,7 @@ db.init_app(app)
 
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
-login_manager.login_message = "Please log in to access that page."
+login_manager.login_message = "Please sign in to continue."
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -1008,6 +1008,7 @@ def index():
 
 
 @app.route("/quiz")
+@login_required
 def quiz():
     shuffled = QUIZ_QUESTIONS[:]
     random.shuffle(shuffled)
@@ -1015,6 +1016,7 @@ def quiz():
 
 
 @app.route("/results", methods=["POST"])
+@login_required
 def results():
     answers = {}
     for q in QUIZ_QUESTIONS:
@@ -1023,19 +1025,19 @@ def results():
             answers[q["id"]] = val
     ranked = calculate_scores(answers)
 
-    if current_user.is_authenticated:
-        result_data = [
-            {"career_id": r["career"]["id"], "pct": r["pct"], "title": r["career"]["title"]}
-            for r in ranked
-        ]
-        qr = QuizResult(user_id=current_user.id, results_json=json.dumps(result_data))
-        db.session.add(qr)
-        db.session.commit()
+    result_data = [
+        {"career_id": r["career"]["id"], "pct": r["pct"], "title": r["career"]["title"]}
+        for r in ranked
+    ]
+    qr = QuizResult(user_id=current_user.id, results_json=json.dumps(result_data))
+    db.session.add(qr)
+    db.session.commit()
 
     return render_template("results.html", ranked=ranked)
 
 
 @app.route("/career/<career_id>")
+@login_required
 def career(career_id):
     c = CAREERS.get(career_id)
     if not c:
@@ -1045,6 +1047,7 @@ def career(career_id):
 
 
 @app.route("/explore")
+@login_required
 def explore():
     return render_template("explore.html", careers=CAREERS)
 
@@ -1058,18 +1061,15 @@ def register():
         return redirect(url_for("dashboard"))
     if request.method == "POST":
         username = request.form.get("username", "").strip()
-        email    = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
-        if not username or not email or not password:
-            flash("All fields are required.", "error")
+        if not username or not password:
+            flash("Both fields are required.", "error")
         elif len(password) < 6:
             flash("Password must be at least 6 characters.", "error")
         elif User.query.filter_by(username=username).first():
             flash("Username already taken.", "error")
-        elif User.query.filter_by(email=email).first():
-            flash("Email already registered.", "error")
         else:
-            user = User(username=username, email=email)
+            user = User(username=username)
             user.set_password(password)
             db.session.add(user)
             db.session.commit()
@@ -1083,16 +1083,14 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for("dashboard"))
     if request.method == "POST":
-        identifier = request.form.get("identifier", "").strip()
-        password   = request.form.get("password", "")
-        user = User.query.filter(
-            (User.username == identifier) | (User.email == identifier.lower())
-        ).first()
+        username = request.form.get("username", "").strip()
+        password = request.form.get("password", "")
+        user = User.query.filter_by(username=username).first()
         if user and user.check_password(password):
             login_user(user)
             next_page = request.args.get("next")
             return redirect(next_page or url_for("dashboard"))
-        flash("Invalid username/email or password.", "error")
+        flash("Invalid username or password.", "error")
     return render_template("login.html")
 
 

@@ -1355,6 +1355,8 @@ ul { list-style: none; }
   min-width: 80px;
 }
 
+.top-match-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.25rem; }
+
 /* All results table */
 .all-results-section { margin-bottom: 3rem; }
 .all-results-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.4rem; }
@@ -1630,6 +1632,30 @@ ul { list-style: none; }
 }
 .form-input::placeholder { color: rgba(255,255,255,0.25); }
 .btn-full { width: 100%; justify-content: center; margin-top: 0.5rem; }
+
+/* Code input */
+.code-input {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  font-family: 'Space Mono', monospace;
+  letter-spacing: 0.35em;
+  padding: 1rem;
+}
+
+/* Verify icon */
+.verify-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(0,212,255,0.1);
+  border: 1px solid rgba(0,212,255,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 0.5rem;
+  color: var(--cyan);
+}
 .auth-switch {
   text-align: center;
   margin-top: 1.5rem;
@@ -1737,281 +1763,241 @@ ul { list-style: none; }
 .btn-sm { padding: 0.35rem 0.85rem; font-size: 0.8rem; }
 
 /* ════════════════════════════════════════════════
-   ROADMAP PAGE
+   ROADMAP PAGE  — vertical tree
    ════════════════════════════════════════════════ */
 .roadmap-hero {
   padding: 5rem 2rem 3rem;
   position: relative;
   overflow: hidden;
-  background: linear-gradient(180deg, rgba(var(--c-rgb,0,212,255),0.07) 0%, transparent 100%);
 }
-.roadmap-hero-inner { max-width: 900px; margin: 0 auto; position: relative; z-index: 1; }
-.roadmap-hero-title { font-size: 2.75rem; font-weight: 800; margin: 0.5rem 0 0.75rem; }
+.roadmap-hero-inner { max-width: 820px; margin: 0 auto; position: relative; z-index: 1; }
+.roadmap-hero-title { font-size: 2.5rem; font-weight: 800; margin: 0.5rem 0 0.5rem; }
 .roadmap-hero-sub { color: var(--text-secondary); margin: 0 0 2rem; }
 
-/* Overall progress */
+/* Progress bar */
 .roadmap-overall-progress {
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 14px;
-  padding: 1.25rem 1.5rem;
-  max-width: 600px;
+  padding: 1.1rem 1.4rem;
+  max-width: 560px;
 }
-.rop-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  margin-bottom: 0.6rem;
-}
-.rop-track {
-  height: 8px;
-  background: rgba(255,255,255,0.08);
-  border-radius: 999px;
-  overflow: hidden;
-  margin-bottom: 0.6rem;
-}
-.rop-fill {
-  height: 100%;
-  border-radius: 999px;
-  transition: width 0.6s ease;
-}
-.rop-stats { font-size: 0.8rem; color: var(--text-secondary); }
+.rop-labels { display: flex; justify-content: space-between; font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 0.5rem; }
+.rop-track { height: 7px; background: rgba(255,255,255,0.08); border-radius: 999px; overflow: hidden; margin-bottom: 0.5rem; }
+.rop-fill { height: 100%; border-radius: 999px; transition: width 0.5s ease; }
+.rop-stats { font-size: 0.78rem; color: var(--text-secondary); }
 
-/* Roadmap body */
-.roadmap-body {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 3rem 2rem 6rem;
+/* ── Tree wrapper ────────────────────────────────── */
+.rm-tree-wrap { max-width: 720px; margin: 0 auto; padding: 3rem 2rem 6rem; }
+.rm-tree { display: flex; flex-direction: column; align-items: center; }
+
+/* Stage header node */
+.rm-stage-node {
   display: flex;
   flex-direction: column;
-  gap: 0;
-}
-
-/* Stage */
-.rm-stage { position: relative; }
-.rm-stage-header {
-  display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
+  margin: 2rem 0 0.25rem;
 }
-.rm-stage-marker {
-  width: 12px;
-  height: 12px;
+.rm-stage-node:first-child { margin-top: 0; }
+.rm-stage-dot {
+  width: 18px; height: 18px;
   border-radius: 50%;
-  flex-shrink: 0;
+  box-shadow: 0 0 16px rgba(0,212,255,0.5);
+  margin-bottom: 0.5rem;
 }
-.rm-stage-title { font-size: 1.1rem; font-weight: 700; margin: 0; white-space: nowrap; }
-.rm-stage-line {
-  flex: 1;
-  height: 1px;
-  opacity: 0.2;
-}
-
-/* Nodes row */
-.rm-nodes-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1rem;
+.rm-stage-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 
-/* Individual node */
+/* Branch row */
+.rm-node-wrap {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  width: 100%;
+  position: relative;
+}
+
+/* Vertical branch line from center to node */
+.rm-node-branch {
+  width: 2px;
+  min-height: 100%;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255,255,255,0.08);
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+/* The actual node card */
 .rm-node {
+  width: 100%;
   background: rgba(255,255,255,0.04);
   border: 1.5px solid rgba(255,255,255,0.1);
   border-radius: 14px;
-  padding: 1.1rem 1.1rem 0.9rem;
-  cursor: pointer;
+  margin: 0.45rem 0;
   position: relative;
-  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  overflow: hidden;
 }
-.rm-node:hover {
-  transform: translateY(-3px);
-  border-color: var(--c, #00d4ff);
-  box-shadow: 0 6px 24px rgba(0,0,0,0.25);
-}
-.rm-node-status-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  margin-bottom: 0.6rem;
-  background: rgba(255,255,255,0.2);
+.rm-node:hover { border-color: var(--c, #00d4ff); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+
+/* Status accent left bar */
+.rm-node::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  border-radius: 14px 0 0 14px;
+  background: transparent;
   transition: background 0.2s;
 }
-.rm-node-title {
-  font-size: 0.9rem;
-  font-weight: 600;
-  line-height: 1.35;
-  margin-bottom: 0.5rem;
+.rm-status-in_progress::before { background: #fbbf24; }
+.rm-status-done::before { background: #22c55e; }
+
+/* Node row: checkbox + body */
+.rm-node-top {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem 0.9rem 0.85rem;
+  cursor: pointer;
+  user-select: none;
 }
-.rm-node-status-label {
-  font-size: 0.72rem;
+.rm-node-title {
+  flex: 1;
+  font-size: 0.92rem;
   font-weight: 600;
+  line-height: 1.3;
+}
+.rm-status-done .rm-node-title { text-decoration: line-through; opacity: 0.55; }
+
+/* Status pill */
+.rm-node-status-pill {
+  font-size: 0.68rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  white-space: nowrap;
+  background: rgba(255,255,255,0.06);
   color: rgba(255,255,255,0.35);
 }
+.rm-status-in_progress .rm-node-status-pill { background: rgba(251,191,36,0.15); color: #fbbf24; }
+.rm-status-done .rm-node-status-pill { background: rgba(34,197,94,0.15); color: #22c55e; }
 
-/* Node status variants */
-.rm-status-not_started { border-color: rgba(255,255,255,0.08); }
-.rm-status-not_started .rm-node-status-dot { background: rgba(255,255,255,0.18); }
-
-.rm-status-in_progress { border-color: rgba(251,191,36,0.5); }
-.rm-status-in_progress .rm-node-status-dot { background: #fbbf24; }
-.rm-status-in_progress .rm-node-status-label { color: #fbbf24; }
-
-.rm-status-done { border-color: rgba(34,197,94,0.5); }
-.rm-status-done .rm-node-status-dot { background: #22c55e; }
-.rm-status-done .rm-node-status-label { color: #22c55e; }
-.rm-status-done .rm-node-title { text-decoration: line-through; opacity: 0.6; }
-
-/* Stage connector */
-.rm-stage-connector {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 0.5rem 0;
-  margin-bottom: 1.5rem;
-}
-.rm-connector-line { width: 2px; height: 28px; opacity: 0.3; }
-.rm-connector-arrow {
-  width: 0;
-  height: 0;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-top: 8px solid;
-  opacity: 0.4;
-}
-
-/* Modal overlay */
-.rm-modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(6px);
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.5rem;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s;
-}
-.rm-modal-overlay.open {
-  opacity: 1;
-  pointer-events: all;
-}
-.rm-modal {
-  background: #0e0e1f;
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 20px;
-  padding: 2rem;
-  max-width: 540px;
-  width: 100%;
-  max-height: 80vh;
-  overflow-y: auto;
-  position: relative;
-  transform: translateY(20px);
-  transition: transform 0.2s;
-}
-.rm-modal-overlay.open .rm-modal { transform: translateY(0); }
-.rm-modal-close {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: rgba(255,255,255,0.06);
-  border: none;
+/* Expand arrow */
+.rm-expand-arrow {
+  width: 16px; height: 16px;
   color: var(--text-secondary);
-  font-size: 1.25rem;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s, color 0.2s;
+  transition: transform 0.22s;
+  flex-shrink: 0;
 }
-.rm-modal-close:hover { background: rgba(255,255,255,0.12); color: var(--text); }
-.rm-modal-header { margin-bottom: 1rem; }
-.rm-modal-status-badge {
-  display: inline-block;
+.rm-node.expanded .rm-expand-arrow { transform: rotate(180deg); }
+
+/* Checkbox button */
+.rm-checkbox {
+  width: 24px; height: 24px;
+  border-radius: 6px;
+  border: 2px solid rgba(255,255,255,0.2);
+  background: transparent;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: border-color 0.18s, background 0.18s;
+  padding: 0;
+}
+.rm-checkbox:hover { border-color: var(--c, #00d4ff); }
+.rm-check-icon { width: 13px; height: 13px; color: transparent; transition: color 0.15s; }
+
+.rm-status-in_progress .rm-checkbox { border-color: #fbbf24; }
+.rm-status-in_progress .rm-check-icon { color: #fbbf24; }
+.rm-status-done .rm-checkbox { border-color: #22c55e; background: rgba(34,197,94,0.15); }
+.rm-status-done .rm-check-icon { color: #22c55e; }
+
+/* Expanded detail panel */
+.rm-node-detail {
+  display: none;
+  padding: 0 1rem 1rem 1rem;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.rm-node-detail.open { display: block; }
+
+.rm-node-desc {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.65;
+  margin: 0.75rem 0 1rem;
+}
+
+/* Resources inside node */
+.rm-node-resources { margin-bottom: 1rem; }
+.rm-res-label {
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.07em;
-  padding: 0.2rem 0.6rem;
-  border-radius: 999px;
-  margin-bottom: 0.6rem;
-}
-.badge-not_started { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.5); }
-.badge-in_progress { background: rgba(251,191,36,0.15); color: #fbbf24; }
-.badge-done { background: rgba(34,197,94,0.15); color: #22c55e; }
-.rm-modal-title { font-size: 1.3rem; font-weight: 700; margin: 0; }
-.rm-modal-desc { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.5rem; }
-
-/* Resources */
-.rm-res-heading {
-  font-size: 0.8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.08em;
   color: var(--text-secondary);
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 .rm-res-link {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  padding: 0.7rem 0.9rem;
+  padding: 0.6rem 0.85rem;
   background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 10px;
-  margin-bottom: 0.5rem;
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 8px;
+  margin-bottom: 0.4rem;
   text-decoration: none;
   color: var(--cyan);
-  font-size: 0.875rem;
-  transition: background 0.2s, border-color 0.2s;
+  font-size: 0.84rem;
+  transition: background 0.18s, border-color 0.18s;
 }
-.rm-res-link:hover {
-  background: rgba(0,212,255,0.08);
-  border-color: rgba(0,212,255,0.3);
-}
-.rm-modal-resources { margin-bottom: 1.75rem; }
+.rm-res-link:hover { background: rgba(0,212,255,0.07); border-color: rgba(0,212,255,0.25); }
+.rm-res-link svg { flex-shrink: 0; opacity: 0.7; }
 
-/* Status buttons in modal */
-.rm-modal-status-btns { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1.25rem; }
-.rm-status-label { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.6rem; }
-.rm-status-row { display: flex; gap: 0.6rem; flex-wrap: wrap; }
-.rm-status-btn {
-  padding: 0.45rem 1rem;
-  border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.15);
+/* Inline status buttons */
+.rm-inline-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.rm-inline-btn {
+  padding: 0.3rem 0.8rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.13);
   background: transparent;
   color: var(--text-secondary);
-  font-size: 0.85rem;
-  font-weight: 500;
+  font-size: 0.78rem;
+  font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition: all 0.18s;
+  transition: all 0.15s;
 }
-.rm-status-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.3); }
-.rm-btn-not-started.active {
-  background: rgba(255,255,255,0.08);
-  border-color: rgba(255,255,255,0.3);
-  color: #fff;
+.rm-inline-btn:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
+.rm-inline-btn.active { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.3); color: #fff; }
+.rm-inline-btn.ip.active { background: rgba(251,191,36,0.15); border-color: #fbbf24; color: #fbbf24; }
+.rm-inline-btn.done.active { background: rgba(34,197,94,0.15); border-color: #22c55e; color: #22c55e; }
+
+/* Inter-stage connector line */
+.rm-tree-connector {
+  width: 2px;
+  height: 32px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  margin: 0.25rem 0;
 }
-.rm-btn-in-progress.active {
-  background: rgba(251,191,36,0.15);
-  border-color: #fbbf24;
-  color: #fbbf24;
-}
-.rm-btn-done.active {
-  background: rgba(34,197,94,0.15);
-  border-color: #22c55e;
-  color: #22c55e;
-}
+
+/* Node body wrapper */
+.rm-node-body { width: 100%; }

@@ -30,16 +30,21 @@
         </div>
         <span class="top-match-pct" style="color: {{ top.career.color }}">{{ top.pct }}% match</span>
       </div>
-      <a href="{{ url_for('career', career_id=top.career.id) }}" class="btn-primary" style="--btn-gradient: {{ top.career.gradient }}">
-        Explore Full Pathway &rarr;
-      </a>
+      <div class="top-match-actions">
+        <a href="{{ url_for('roadmap', career_id=top.career.id) }}" class="btn-primary" style="--btn-gradient: {{ top.career.gradient }}">
+          Start Roadmap &rarr;
+        </a>
+        <a href="{{ url_for('career', career_id=top.career.id) }}" class="btn-ghost">
+          View Full Profile
+        </a>
+      </div>
       <div class="top-match-glow" style="background: {{ top.career.gradient }}"></div>
     </div>
 
     <!-- ALL CAREERS RANKED -->
     <div class="all-results-section">
-      <h2 class="all-results-title">All <span class="gradient-text">7 Career Scores</span></h2>
-      <p class="all-results-sub">Ranked from highest to lowest match. Click any career to explore its full roadmap.</p>
+      <h2 class="all-results-title">All <span class="gradient-text">8 Career Scores</span></h2>
+      <p class="all-results-sub">Ranked from highest to lowest match. Click any career to start its roadmap.</p>
 
       <div class="results-table">
         {% for item in ranked %}
@@ -66,8 +71,8 @@
             <span class="result-pct" style="color: {{ item.career.color }}">{{ item.pct }}%</span>
           </div>
 
-          <a href="{{ url_for('career', career_id=item.career.id) }}" class="result-explore-btn" style="--c: {{ item.career.color }}">
-            View Path
+          <a href="{{ url_for('roadmap', career_id=item.career.id) }}" class="result-explore-btn" style="--c: {{ item.career.color }}">
+            Roadmap
           </a>
 
         </div>
@@ -78,16 +83,7 @@
     <!-- Action row -->
     <div class="results-actions">
       <a href="{{ url_for('quiz') }}" class="btn-ghost">Retake Assessment</a>
-      {% if current_user.is_authenticated %}
-        <a href="{{ url_for('roadmap', career_id=top.career.id) }}" class="btn-primary"
-           style="--btn-gradient: {{ top.career.gradient }}">
-          Start My Roadmap &rarr;
-        </a>
-      {% else %}
-        <a href="{{ url_for('register') }}" class="btn-primary">
-          Save Results &amp; Start Roadmap &rarr;
-        </a>
-      {% endif %}
+      <a href="{{ url_for('dashboard') }}" class="btn-ghost">Dashboard</a>
     </div>
 
   </div>

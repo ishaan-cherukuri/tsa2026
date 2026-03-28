@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Verify Your Email — STEMpathAI{% endblock %}
+
+{% block content %}
+<section class="auth-page">
+  <div class="auth-container">
+
+    <div class="auth-header">
+      <div class="verify-icon">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="2" y="4" width="20" height="16" rx="3"/>
+          <path d="M2 7l10 7 10-7"/>
+        </svg>
+      </div>
+      <div class="section-label" style="margin-top:1rem;">Email Verification</div>
+      <h1 class="auth-title">Check Your <span class="gradient-text">Inbox</span></h1>
+      <p class="auth-sub">
+        We sent a 6-digit code to<br>
+        <strong style="color:var(--cyan)">{{ email }}</strong>
+      </p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash-msg flash-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <form class="auth-form" method="POST" action="{{ url_for('verify_email') }}">
+      <div class="form-group">
+        <label class="form-label" for="code">6-Digit Verification Code</label>
+        <input
+          class="form-input code-input"
+          type="text"
+          id="code"
+          name="code"
+          placeholder="_ _ _ _ _ _"
+          maxlength="6"
+          inputmode="numeric"
+          pattern="[0-9]{6}"
+          autocomplete="one-time-code"
+          required
+          autofocus
+        />
+      </div>
+      <button type="submit" class="btn-primary btn-full">Verify Email &rarr;</button>
+    </form>
+
+    <p class="auth-switch" style="margin-top:1.25rem;">
+      Didn't receive it?
+      <a href="{{ url_for('resend_code') }}" class="auth-link">Resend code &rarr;</a>
+    </p>
+    <p class="auth-switch" style="margin-top:0.5rem;font-size:0.8rem;color:rgba(255,255,255,0.25);">
+      Check your spam folder. Code expires in 15 minutes.
+    </p>
+
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  // Auto-format: only allow digits, jump to submit on 6 chars
+  const codeInput = document.getElementById('code');
+  codeInput.addEventListener('input', function () {
+    this.value = this.value.replace(/\D/g, '').slice(0, 6);
+    if (this.value.length === 6) {
+      this.closest('form').submit();
+    }
+  });
+</script>
+{% endblock %}

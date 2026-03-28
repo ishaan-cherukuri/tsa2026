@@ -8,11 +8,10 @@ db = SQLAlchemy()
 
 
 class User(UserMixin, db.Model):
-    id           = db.Column(db.Integer, primary_key=True)
-    username     = db.Column(db.String(80), unique=True, nullable=False)
-    email        = db.Column(db.String(120), unique=True, nullable=False)
+    id            = db.Column(db.Integer, primary_key=True)
+    username      = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(256))
-    created_at   = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at    = db.Column(db.DateTime, default=datetime.utcnow)
 
     progress = db.relationship("RoadmapProgress", backref="user", lazy=True,
                                 cascade="all, delete-orphan")
@@ -27,10 +26,10 @@ class User(UserMixin, db.Model):
 
 
 class QuizResult(db.Model):
-    id          = db.Column(db.Integer, primary_key=True)
-    user_id     = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    id           = db.Column(db.Integer, primary_key=True)
+    user_id      = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     results_json = db.Column(db.Text)   # JSON: [{career_id, pct, title}, ...]
-    created_at  = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at   = db.Column(db.DateTime, default=datetime.utcnow)
 
     def get_results(self):
         return json.loads(self.results_json) if self.results_json else []
