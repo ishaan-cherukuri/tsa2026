@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — STEMpathAI{% endblock %}
+
+{% block content %}
+<section class="dashboard-page">
+  <div class="dashboard-inner">
+
+    <div class="dashboard-header">
+      <div class="section-label">Your Career Hub</div>
+      <h1 class="dash-title">Welcome back, <span class="gradient-text">{{ current_user.username }}</span></h1>
+      <p class="dash-sub">Track your roadmap progress and review your career assessment history.</p>
+    </div>
+
+    <!-- ACTIVE ROADMAPS -->
+    <div class="dash-section">
+      <h2 class="dash-section-title">Active Roadmaps</h2>
+      {% if active_roadmaps %}
+        <div class="dash-roadmaps-grid">
+          {% for item in active_roadmaps %}
+          <a href="{{ url_for('roadmap', career_id=item.career.id) }}"
+             class="dash-roadmap-card" style="--c: {{ item.career.color }}; --grad: {{ item.career.gradient }}">
+            <div class="drm-color-bar" style="background: {{ item.career.gradient }}"></div>
+            <div class="drm-body">
+              <div class="drm-title">{{ item.career.title }}</div>
+              <div class="drm-progress-wrap">
+                <div class="drm-progress-track">
+                  <div class="drm-progress-fill"
+                       style="width: {{ ((item.done / item.total * 100) if item.total > 0 else 0)|round|int }}%;
+                              background: {{ item.career.gradient }}"></div>
+                </div>
+                <span class="drm-pct">{{ ((item.done / item.total * 100) if item.total > 0 else 0)|round|int }}%</span>
+              </div>
+              <div class="drm-stats">
+                <span class="drm-stat done-stat">{{ item.done }} done</span>
+                <span class="drm-stat">&middot;</span>
+                <span class="drm-stat">{{ item.total - item.done }} remaining</span>
+              </div>
+            </div>
+            <div class="drm-arrow">Continue &rarr;</div>
+          </a>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="dash-empty">
+          <p class="dash-empty-text">No active roadmaps yet. Take the quiz and start one!</p>
+          <a href="{{ url_for('quiz') }}" class="btn-primary">Take the Assessment &rarr;</a>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- QUIZ HISTORY -->
+    <div class="dash-section">
+      <h2 class="dash-section-title">Assessment History</h2>
+      {% if parsed_results %}
+        <div class="dash-history">
+          {% for item in parsed_results %}
+          <div class="history-card">
+            <div class="history-date">{{ item.created_at.strftime('%B %d, %Y') }}</div>
+            <div class="history-matches">
+              {% for match in item.top %}
+              <div class="history-match" style="--c: {{ careers[match.career_id].color if match.career_id in careers else '#00d4ff' }}">
+                <span class="hm-rank">#{{ loop.index }}</span>
+                <span class="hm-title">{{ match.title }}</span>
+                <span class="hm-pct">{{ match.pct }}%</span>
+              </div>
+              {% endfor %}
+            </div>
+            <div class="history-actions">
+              {% if item.top %}
+              <a href="{{ url_for('roadmap', career_id=item.top[0].career_id) }}"
+                 class="btn-ghost btn-sm">Start Roadmap</a>
+              {% endif %}
+              <a href="{{ url_for('quiz') }}" class="btn-ghost btn-sm">Retake</a>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="dash-empty">
+          <p class="dash-empty-text">No assessments taken yet.</p>
+          <a href="{{ url_for('quiz') }}" class="btn-primary">Find My Career Match &rarr;</a>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- EXPLORE ALL ROADMAPS -->
+    <div class="dash-section">
+      <h2 class="dash-section-title">Explore All Roadmaps</h2>
+      <div class="careers-grid">
+        {% for c in careers.values() %}
+        <a href="{{ url_for('roadmap', career_id=c.id) }}" class="career-card" style="--card-color: {{ c.color }}">
+          <div class="card-glow"></div>
+          <div class="card-color-bar" style="background: {{ c.gradient }}"></div>
+          <h3 class="card-title">{{ c.title }}</h3>
+          <div class="card-salary">{{ c.salary }}</div>
+          <div class="card-growth"><span class="growth-badge">{{ c.growth }} growth</span></div>
+          <p class="card-desc">{{ c.description[:100] }}...</p>
+          <div class="card-arrow">View Roadmap &rarr;</div>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}

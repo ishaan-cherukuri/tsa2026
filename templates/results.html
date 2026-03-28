@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Your STEM Career Results — STEMpathAI{% endblock %}
+
+{% block content %}
+<section class="results-page">
+  <div class="results-container">
+
+    <div class="results-header">
+      <div class="section-label">Assessment Complete</div>
+      <h1 class="results-title">Your <span class="gradient-text">Career Match Scores</span></h1>
+      <p class="results-sub">
+        Every STEM career ranked by how well your answers align with that field.
+        Scores are calculated from all 28 questions across subjects, personality, hypotheticals, values, and interests.
+      </p>
+    </div>
+
+    <!-- Top match highlight -->
+    {% set top = ranked[0] %}
+    <div class="top-match-banner" style="--c: {{ top.career.color }}; --grad: {{ top.career.gradient }}">
+      <div class="top-match-label">Your #1 Match</div>
+      <h2 class="top-match-title">{{ top.career.title }}</h2>
+      <p class="top-match-desc">{{ top.career.description[:200] }}...</p>
+      <div class="top-match-meta">
+        <span class="meta-chip">{{ top.career.salary }}</span>
+        <span class="meta-chip">{{ top.career.growth }} job growth &mdash; {{ top.career.growth_label }}</span>
+      </div>
+      <div class="top-match-score-wrap">
+        <div class="top-match-bar">
+          <div class="top-match-fill" data-pct="{{ top.pct }}" style="width:0%; background: {{ top.career.gradient }}"></div>
+        </div>
+        <span class="top-match-pct" style="color: {{ top.career.color }}">{{ top.pct }}% match</span>
+      </div>
+      <a href="{{ url_for('career', career_id=top.career.id) }}" class="btn-primary" style="--btn-gradient: {{ top.career.gradient }}">
+        Explore Full Pathway &rarr;
+      </a>
+      <div class="top-match-glow" style="background: {{ top.career.gradient }}"></div>
+    </div>
+
+    <!-- ALL CAREERS RANKED -->
+    <div class="all-results-section">
+      <h2 class="all-results-title">All <span class="gradient-text">7 Career Scores</span></h2>
+      <p class="all-results-sub">Ranked from highest to lowest match. Click any career to explore its full roadmap.</p>
+
+      <div class="results-table">
+        {% for item in ranked %}
+        <div class="result-row" style="--c: {{ item.career.color }}; --grad: {{ item.career.gradient }}">
+
+          <div class="result-rank">
+            <span class="rank-number">{{ loop.index }}</span>
+          </div>
+
+          <div class="result-color-dot" style="background: {{ item.career.gradient }}"></div>
+
+          <div class="result-info">
+            <div class="result-name">{{ item.career.title }}</div>
+            <div class="result-salary">{{ item.career.salary }}</div>
+          </div>
+
+          <div class="result-bar-section">
+            <div class="result-bar-track">
+              <div class="result-bar-fill"
+                   data-pct="{{ item.pct }}"
+                   style="width: 0%; background: {{ item.career.gradient }}">
+              </div>
+            </div>
+            <span class="result-pct" style="color: {{ item.career.color }}">{{ item.pct }}%</span>
+          </div>
+
+          <a href="{{ url_for('career', career_id=item.career.id) }}" class="result-explore-btn" style="--c: {{ item.career.color }}">
+            View Path
+          </a>
+
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Action row -->
+    <div class="results-actions">
+      <a href="{{ url_for('quiz') }}" class="btn-ghost">Retake Assessment</a>
+      {% if current_user.is_authenticated %}
+        <a href="{{ url_for('roadmap', career_id=top.career.id) }}" class="btn-primary"
+           style="--btn-gradient: {{ top.career.gradient }}">
+          Start My Roadmap &rarr;
+        </a>
+      {% else %}
+        <a href="{{ url_for('register') }}" class="btn-primary">
+          Save Results &amp; Start Roadmap &rarr;
+        </a>
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.querySelectorAll('.result-bar-fill, .top-match-fill').forEach(el => {
+        el.style.transition = 'width 1.4s cubic-bezier(0.4,0,0.2,1)';
+        el.style.width = el.dataset.pct + '%';
+      });
+    }, 150);
+  });
+</script>
+{% endblock %}

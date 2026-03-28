@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Create Account — STEMpathAI{% endblock %}
+
+{% block content %}
+<section class="auth-page">
+  <div class="auth-container">
+
+    <div class="auth-header">
+      <div class="section-label">Join STEMpathAI</div>
+      <h1 class="auth-title">Create Your <span class="gradient-text">Free Account</span></h1>
+      <p class="auth-sub">Save your quiz results and track your career roadmap progress.</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash-msg flash-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <form class="auth-form" method="POST" action="{{ url_for('register') }}">
+      <div class="form-group">
+        <label class="form-label" for="username">Username</label>
+        <input class="form-input" type="text" id="username" name="username"
+               placeholder="choose_a_username" required autocomplete="username" minlength="3" maxlength="80" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="email">Email</label>
+        <input class="form-input" type="email" id="email" name="email"
+               placeholder="you@example.com" required autocomplete="email" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <input class="form-input" type="password" id="password" name="password"
+               placeholder="at least 6 characters" required autocomplete="new-password" minlength="6" />
+      </div>
+      <button type="submit" class="btn-primary btn-full">Create Account &rarr;</button>
+    </form>
+
+    <p class="auth-switch">
+      Already have an account?
+      <a href="{{ url_for('login') }}" class="auth-link">Sign in &rarr;</a>
+    </p>
+
+  </div>
+</section>
+{% endblock %}

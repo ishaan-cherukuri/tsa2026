@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block title %}Career Assessment — STEMpathAI{% endblock %}
+
+{% block content %}
+<section class="quiz-page">
+  <div class="quiz-container">
+
+    <div class="quiz-header">
+      <div class="section-label">28-Question Career Assessment</div>
+      <h1 class="quiz-title">Find Your <span class="gradient-text">STEM Career Match</span></h1>
+      <p class="quiz-sub">
+        Answer all {{ questions|length }} questions honestly. There are no right or wrong answers —
+        the more truthful you are, the more accurate your career match will be.
+      </p>
+    </div>
+
+    <!-- Progress -->
+    <div class="quiz-progress-wrap">
+      <div class="quiz-progress-bar">
+        <div class="quiz-progress-fill" id="progress-fill" style="width: 0%"></div>
+      </div>
+      <div class="quiz-progress-text">
+        <span id="q-current">0</span> / <span>{{ questions|length }}</span> answered
+      </div>
+    </div>
+
+    <form action="{{ url_for('results') }}" method="POST" id="quiz-form">
+      {% for q in questions %}
+      <div class="quiz-question {% if loop.first %}active{% endif %}"
+           id="question-{{ loop.index0 }}"
+           data-index="{{ loop.index0 }}">
+
+        <div class="question-header">
+          <span class="question-number">Question {{ loop.index }} of {{ questions|length }}</span>
+        </div>
+
+        <h2 class="question-text">{{ q.question }}</h2>
+
+        <div class="options-grid">
+          {% for opt in q.options %}
+          <label class="option-label" for="{{ q.id }}-{{ loop.index0 }}">
+            <input
+              type="radio"
+              name="{{ q.id }}"
+              id="{{ q.id }}-{{ loop.index0 }}"
+              value="{{ loop.index0 }}"
+              class="option-input"
+            />
+            <div class="option-card">
+              <div class="option-indicator"></div>
+              <span class="option-text">{{ opt.text }}</span>
+            </div>
+          </label>
+          {% endfor %}
+        </div>
+
+        <div class="question-nav">
+          {% if not loop.first %}
+          <button type="button" class="btn-ghost btn-nav" onclick="goQuestion({{ loop.index0 - 1 }})">
+            &larr; Previous
+          </button>
+          {% else %}
+          <span></span>
+          {% endif %}
+
+          {% if not loop.last %}
+          <button type="button" class="btn-primary btn-nav btn-next"
+                  onclick="goQuestion({{ loop.index0 + 1 }})"
+                  id="next-{{ loop.index0 }}" disabled>
+            Next &rarr;
+          </button>
+          {% else %}
+          <button type="submit" class="btn-primary btn-nav" id="submit-btn" disabled>
+            View My Results &rarr;
+          </button>
+          {% endif %}
+        </div>
+
+      </div>
+      {% endfor %}
+    </form>
+
+    <div class="quiz-footer-note">
+      Your answers are scored against all 7 STEM career paths simultaneously.
+      You will see a percentage match for every career at the end.
+    </div>
+
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  let currentQ = 0;
+  const totalQ = {{ questions|length }};
+
+  function updateProgress() {
+    let answered = 0;
+    document.querySelectorAll('.quiz-question').forEach(qEl => {
+      const name = qEl.querySelector('input[type=radio]').name;
+      if (document.querySelector(`input[name="${name}"]:checked`)) answered++;
+    });
+    const pct = (answered / totalQ) * 100;
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('q-current').textContent = answered;
+  }
+
+  function goQuestion(index) {
+    const questions = document.querySelectorAll('.quiz-question');
+    const direction = index > currentQ ? 'left' : 'right';
+
+    questions[currentQ].classList.remove('active');
+    questions[currentQ].classList.add('exit-' + direction);
+
+    setTimeout(() => {
+      questions[currentQ].classList.remove('exit-left', 'exit-right');
+      currentQ = index;
+      questions[currentQ].classList.add('active');
+    }, 280);
+  }
+
+  document.querySelectorAll('.option-input').forEach(input => {
+    input.addEventListener('change', function () {
+      const qEl = this.closest('.quiz-question');
+      const idx = parseInt(qEl.dataset.index);
+
+      qEl.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+      this.nextElementSibling.classList.add('selected');
+
+      const nextBtn = document.getElementById('next-' + idx);
+      const submitBtn = document.getElementById('submit-btn');
+      if (nextBtn) nextBtn.disabled = false;
+      if (submitBtn && idx === totalQ - 1) submitBtn.disabled = false;
+
+      updateProgress();
+    });
+  });
+
+  updateProgress();
+</script>
+{% endblock %}

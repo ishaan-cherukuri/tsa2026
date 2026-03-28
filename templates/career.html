@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% block title %}{{ career.title }} — STEMpathAI{% endblock %}
+
+{% block content %}
+
+<section class="career-hero" style="--c: {{ career.color }}; --grad: {{ career.gradient }}">
+  <div class="career-hero-inner">
+    <a href="{{ url_for('explore') }}" class="back-link">&larr; All Careers</a>
+    <div class="section-label">STEM Career Profile</div>
+    <h1 class="career-hero-title">{{ career.title }}</h1>
+    <div class="career-meta-row">
+      <div class="meta-chip">{{ career.salary }}</div>
+      <div class="meta-chip">{{ career.growth }} growth &mdash; {{ career.growth_label }}</div>
+    </div>
+    <p class="career-hero-desc">{{ career.description }}</p>
+    <a href="{{ url_for('quiz') }}" class="btn-primary" style="--btn-gradient: {{ career.gradient }}">
+      Take the Career Assessment &rarr;
+    </a>
+  </div>
+  <div class="hero-color-bar" style="background: {{ career.gradient }}"></div>
+</section>
+
+<div class="career-body">
+  <div class="career-body-inner">
+
+    <div class="career-left">
+
+      <!-- HS Courses -->
+      <div class="info-card">
+        <div class="info-card-header" style="--c: {{ career.color }}">
+          <div class="info-card-marker" style="background: {{ career.gradient }}"></div>
+          <h2 class="info-card-title">High School Course Preparation</h2>
+        </div>
+        <p class="info-card-intro">These courses build the foundation you need to succeed in this career field:</p>
+        <ul class="course-list">
+          {% for course in career.hs_courses %}
+          <li class="course-item">
+            <span class="course-bullet" style="background: {{ career.gradient }}"></span>
+            {{ course }}
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <!-- Extracurriculars -->
+      <div class="info-card">
+        <div class="info-card-header" style="--c: {{ career.color }}">
+          <div class="info-card-marker" style="background: {{ career.gradient }}"></div>
+          <h2 class="info-card-title">Extracurriculars &amp; Experiential Learning</h2>
+        </div>
+        <p class="info-card-intro">Real-world experience that strengthens your college application:</p>
+        <ul class="activity-list">
+          {% for act in career.extracurriculars %}
+          <li class="activity-item">
+            <div class="activity-dot" style="background: {{ career.color }}"></div>
+            <span>{{ act }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <!-- Skills -->
+      <div class="info-card">
+        <div class="info-card-header" style="--c: {{ career.color }}">
+          <div class="info-card-marker" style="background: {{ career.gradient }}"></div>
+          <h2 class="info-card-title">Professional Skills Needed</h2>
+        </div>
+        <p class="info-card-intro">Technical and soft skills to develop throughout high school and college:</p>
+        <div class="skills-cloud">
+          {% for skill in career.skills %}
+          <div class="skill-tag" style="--c: {{ career.color }}">{{ skill }}</div>
+          {% endfor %}
+        </div>
+      </div>
+
+    </div>
+
+    <div class="career-right">
+
+      <!-- Career Pathway Timeline -->
+      <div class="info-card">
+        <div class="info-card-header" style="--c: {{ career.color }}">
+          <div class="info-card-marker" style="background: {{ career.gradient }}"></div>
+          <h2 class="info-card-title">Career Pathway</h2>
+        </div>
+        <p class="info-card-intro">Your step-by-step roadmap from high school to your first professional role:</p>
+        <div class="timeline">
+          {% for step in career.pathway %}
+          <div class="timeline-item">
+            <div class="timeline-node" style="background: {{ career.gradient }}">
+              <span class="timeline-node-inner"></span>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-stage" style="color: {{ career.color }}">{{ step.stage }}</div>
+              <p class="timeline-desc">{{ step.desc }}</p>
+            </div>
+            {% if not loop.last %}
+            <div class="timeline-connector" style="background: {{ career.color }}"></div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Education Links -->
+      <div class="info-card">
+        <div class="info-card-header" style="--c: {{ career.color }}">
+          <div class="info-card-marker" style="background: {{ career.gradient }}"></div>
+          <h2 class="info-card-title">Post-Secondary Education Options</h2>
+        </div>
+        <p class="info-card-intro">Degree programs, certifications, and online resources to explore:</p>
+        <div class="edu-links">
+          {% for link in career.education_links %}
+          <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer"
+             class="edu-link" style="--c: {{ career.color }}">
+            <span class="edu-link-label">{{ link.label }}</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
+              <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Entry Level Jobs -->
+      <div class="info-card">
+        <div class="info-card-header" style="--c: {{ career.color }}">
+          <div class="info-card-marker" style="background: {{ career.gradient }}"></div>
+          <h2 class="info-card-title">Entry-Level Job Examples</h2>
+        </div>
+        <p class="info-card-intro">Real job titles you can land right out of school or a certification program:</p>
+        <div class="jobs-grid">
+          {% for job in career.entry_jobs %}
+          <div class="job-tag" style="--c: {{ career.color }}">{{ job }}</div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Notable Companies -->
+      <div class="info-card">
+        <div class="info-card-header" style="--c: {{ career.color }}">
+          <div class="info-card-marker" style="background: {{ career.gradient }}"></div>
+          <h2 class="info-card-title">Notable Companies Hiring in This Field</h2>
+        </div>
+        <p class="info-card-intro">Organizations where {{ career.title }}s build careers:</p>
+        <div class="companies-grid">
+          {% for company in career.notable_companies %}
+          <div class="company-card" style="--c: {{ career.color }}">
+            <div class="company-name">{{ company.name }}</div>
+            <div class="company-note">{{ company.note }}</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Other careers -->
+<section class="section">
+  <div class="section-inner">
+    <h2 class="section-title">Explore Other <span class="gradient-text">STEM Careers</span></h2>
+    <div class="careers-grid">
+      {% for c in all_careers %}
+        {% if c.id != career.id %}
+        <a href="{{ url_for('career', career_id=c.id) }}" class="career-card" style="--card-color: {{ c.color }}">
+          <div class="card-glow"></div>
+          <div class="card-color-bar" style="background: {{ c.gradient }}"></div>
+          <h3 class="card-title">{{ c.title }}</h3>
+          <div class="card-salary">{{ c.salary }}</div>
+          <div class="card-growth"><span class="growth-badge">{{ c.growth }} growth</span></div>
+          <p class="card-desc">{{ c.description[:110] }}...</p>
+          <div class="card-arrow">Explore Path &rarr;</div>
+        </a>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% endblock %}

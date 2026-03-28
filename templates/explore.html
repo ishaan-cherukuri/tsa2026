@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Explore All Careers — STEMpathAI{% endblock %}
+
+{% block content %}
+<section class="section" style="padding-top: 6rem;">
+  <div class="section-inner">
+    <div class="section-label">All STEM Careers</div>
+    <h1 class="section-title">Explore Every <span class="gradient-text">Career Path</span></h1>
+    <p class="section-sub">Browse all 7 featured STEM careers. Click any card to see the full pathway, skills, college links, and entry-level jobs.</p>
+
+    <div class="explore-controls">
+      <div class="search-wrap">
+        <svg class="search-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" id="career-search" placeholder="Search by career, skill, or field..." class="search-input" />
+      </div>
+    </div>
+
+    <div class="careers-grid explore-grid" id="careers-grid">
+      {% for career in careers.values() %}
+      <a href="{{ url_for('career', career_id=career.id) }}"
+         class="career-card"
+         style="--card-color:{{ career.color }}"
+         data-tags="{{ career.skills|join(' ')|lower }} {{ career.title|lower }}">
+        <div class="card-glow"></div>
+        <div class="card-color-bar" style="background: {{ career.gradient }}"></div>
+        <h3 class="card-title">{{ career.title }}</h3>
+        <div class="card-salary">{{ career.salary }}</div>
+        <div class="card-growth">
+          <span class="growth-badge">{{ career.growth }} growth &mdash; {{ career.growth_label }}</span>
+        </div>
+        <p class="card-desc">{{ career.description[:150] }}...</p>
+        <div class="card-skills">
+          {% for skill in career.skills[:3] %}
+          <span class="card-skill-tag">{{ skill }}</span>
+          {% endfor %}
+        </div>
+        <div class="card-arrow">Explore Full Path &rarr;</div>
+      </a>
+      {% endfor %}
+    </div>
+
+    <div class="explore-cta">
+      <p>Not sure which career fits you best?</p>
+      <a href="{{ url_for('quiz') }}" class="btn-primary">Take the 28-Question Assessment &rarr;</a>
+    </div>
+
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  const searchInput = document.getElementById('career-search');
+  const cards = document.querySelectorAll('#careers-grid .career-card');
+  searchInput.addEventListener('input', () => {
+    const q = searchInput.value.toLowerCase().trim();
+    cards.forEach(card => {
+      const tags = (card.dataset.tags || '') + ' ' + card.querySelector('.card-title').textContent.toLowerCase();
+      card.style.display = (!q || tags.includes(q)) ? '' : 'none';
+    });
+  });
+</script>
+{% endblock %}

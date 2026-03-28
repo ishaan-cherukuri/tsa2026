@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+{% block title %}{{ career.title }} Roadmap — STEMpathAI{% endblock %}
+
+{% block content %}
+<section class="roadmap-hero" style="--c: {{ career.color }}; --grad: {{ career.gradient }}">
+  <div class="roadmap-hero-inner">
+    <a href="{{ url_for('dashboard') }}" class="back-link">&larr; Dashboard</a>
+    <div class="section-label">Interactive Career Roadmap</div>
+    <h1 class="roadmap-hero-title">{{ career.title }}</h1>
+    <p class="roadmap-hero-sub">Click any node to view resources and update your progress.</p>
+
+    <!-- Overall progress bar -->
+    <div class="roadmap-overall-progress">
+      <div class="rop-labels">
+        <span>Overall Progress</span>
+        <span id="rop-pct-label">{{ ((done_count / total_nodes * 100) if total_nodes > 0 else 0)|round|int }}%</span>
+      </div>
+      <div class="rop-track">
+        <div class="rop-fill" id="rop-fill"
+             style="width: {{ ((done_count / total_nodes * 100) if total_nodes > 0 else 0)|round|int }}%;
+                    background: {{ career.gradient }}"></div>
+      </div>
+      <div class="rop-stats">
+        <span id="rop-done">{{ done_count }}</span> of {{ total_nodes }} nodes completed
+        &nbsp;&middot;&nbsp;
+        <span id="rop-ip">{{ ip_count }}</span> in progress
+      </div>
+    </div>
+  </div>
+  <div class="hero-color-bar" style="background: {{ career.gradient }}"></div>
+</section>
+
+<!-- Roadmap stages -->
+<div class="roadmap-body">
+  {% for stage in roadmap.stages %}
+  <div class="rm-stage">
+    <div class="rm-stage-header">
+      <div class="rm-stage-marker" style="background: {{ career.gradient }}"></div>
+      <h2 class="rm-stage-title" style="color: {{ career.color }}">{{ stage.title }}</h2>
+      <div class="rm-stage-line" style="background: {{ career.color }}"></div>
+    </div>
+
+    <div class="rm-nodes-row">
+      {% for node in stage.nodes %}
+      {% set status = progress_map.get(node.id, 'not_started') %}
+      <div class="rm-node rm-status-{{ status }}"
+           data-node-id="{{ node.id }}"
+           data-career-id="{{ career.id }}"
+           data-status="{{ status }}"
+           style="--c: {{ career.color }}; --grad: {{ career.gradient }}"
+           onclick="openNode(this)">
+        <div class="rm-node-status-dot"></div>
+        <div class="rm-node-title">{{ node.title }}</div>
+        <div class="rm-node-status-label">
+          {% if status == 'done' %}Done
+          {% elif status == 'in_progress' %}In Progress
+          {% else %}Not Started{% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% if not loop.last %}
+    <div class="rm-stage-connector">
+      <div class="rm-connector-line" style="background: {{ career.color }}"></div>
+      <div class="rm-connector-arrow" style="border-top-color: {{ career.color }}"></div>
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Node detail modal -->
+<div class="rm-modal-overlay" id="rm-modal-overlay" onclick="closeModal(event)">
+  <div class="rm-modal" id="rm-modal">
+    <button class="rm-modal-close" onclick="closeModal()">&times;</button>
+
+    <div class="rm-modal-header">
+      <div class="rm-modal-status-badge" id="modal-status-badge"></div>
+      <h2 class="rm-modal-title" id="modal-title"></h2>
+    </div>
+
+    <p class="rm-modal-desc" id="modal-desc"></p>
+
+    <div class="rm-modal-resources" id="modal-resources"></div>
+
+    <div class="rm-modal-status-btns">
+      <div class="rm-status-label">Mark as:</div>
+      <div class="rm-status-row">
+        <button class="rm-status-btn rm-btn-not-started"
+                onclick="setStatus('not_started')">Not Started</button>
+        <button class="rm-status-btn rm-btn-in-progress"
+                onclick="setStatus('in_progress')">In Progress</button>
+        <button class="rm-status-btn rm-btn-done"
+                onclick="setStatus('done')">Done</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Node data embedded as JSON for JS -->
+<script id="roadmap-json" type="application/json">
+{{ roadmap | tojson }}
+</script>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  const roadmapData = JSON.parse(document.getElementById('roadmap-json').textContent);
+  const careerId = {{ career.id | tojson }};
+  const totalNodes = {{ total_nodes }};
+
+  // Build node lookup map {node_id -> node data}
+  const nodeMap = {};
+  roadmapData.stages.forEach(stage => {
+    stage.nodes.forEach(node => { nodeMap[node.id] = node; });
+  });
+
+  let activeNodeEl = null;
+
+  function openNode(el) {
+    const nodeId = el.dataset.nodeId;
+    const node = nodeMap[nodeId];
+    if (!node) return;
+
+    activeNodeEl = el;
+    const status = el.dataset.status;
+
+    document.getElementById('modal-title').textContent = node.title;
+    document.getElementById('modal-desc').textContent = node.desc;
+
+    // Status badge
+    const badge = document.getElementById('modal-status-badge');
+    badge.textContent = statusLabel(status);
+    badge.className = 'rm-modal-status-badge badge-' + status;
+
+    // Resources
+    const resEl = document.getElementById('modal-resources');
+    resEl.innerHTML = '';
+    if (node.resources && node.resources.length) {
+      const h = document.createElement('div');
+      h.className = 'rm-res-heading';
+      h.textContent = 'Resources';
+      resEl.appendChild(h);
+      node.resources.forEach(r => {
+        const a = document.createElement('a');
+        a.href = r.url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.className = 'rm-res-link';
+        a.innerHTML = `<span>${r.label}</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
+            <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>`;
+        resEl.appendChild(a);
+      });
+    }
+
+    // Active status buttons
+    document.querySelectorAll('.rm-status-btn').forEach(b => b.classList.remove('active'));
+    const btnMap = {
+      'not_started': '.rm-btn-not-started',
+      'in_progress': '.rm-btn-in-progress',
+      'done': '.rm-btn-done'
+    };
+    document.querySelector(btnMap[status])?.classList.add('active');
+
+    document.getElementById('rm-modal-overlay').classList.add('open');
+  }
+
+  function closeModal(e) {
+    if (e && e.target !== document.getElementById('rm-modal-overlay')) return;
+    document.getElementById('rm-modal-overlay').classList.remove('open');
+    activeNodeEl = null;
+  }
+
+  function statusLabel(s) {
+    return { not_started: 'Not Started', in_progress: 'In Progress', done: 'Done' }[s] || s;
+  }
+
+  function setStatus(newStatus) {
+    if (!activeNodeEl) return;
+    const nodeId = activeNodeEl.dataset.nodeId;
+
+    fetch('/api/progress', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ career_id: careerId, node_id: nodeId, status: newStatus }),
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (!data.ok) return;
+
+      const old = activeNodeEl.dataset.status;
+      activeNodeEl.dataset.status = newStatus;
+      activeNodeEl.className = activeNodeEl.className
+        .replace(/rm-status-\S+/, 'rm-status-' + newStatus);
+      activeNodeEl.querySelector('.rm-node-status-label').textContent = statusLabel(newStatus);
+
+      // Update badge
+      const badge = document.getElementById('modal-status-badge');
+      badge.textContent = statusLabel(newStatus);
+      badge.className = 'rm-modal-status-badge badge-' + newStatus;
+
+      // Active button
+      document.querySelectorAll('.rm-status-btn').forEach(b => b.classList.remove('active'));
+      const btnMap = {
+        'not_started': '.rm-btn-not-started',
+        'in_progress': '.rm-btn-in-progress',
+        'done': '.rm-btn-done'
+      };
+      document.querySelector(btnMap[newStatus])?.classList.add('active');
+
+      // Update overall progress bar
+      updateOverallProgress(old, newStatus);
+    });
+  }
+
+  function updateOverallProgress(oldStatus, newStatus) {
+    const doneEl = document.getElementById('rop-done');
+    const ipEl   = document.getElementById('rop-ip');
+    let done = parseInt(doneEl.textContent);
+    let ip   = parseInt(ipEl.textContent);
+
+    if (oldStatus === 'done')        done--;
+    if (oldStatus === 'in_progress') ip--;
+    if (newStatus === 'done')        done++;
+    if (newStatus === 'in_progress') ip++;
+
+    done = Math.max(0, done);
+    ip   = Math.max(0, ip);
+
+    doneEl.textContent = done;
+    ipEl.textContent   = ip;
+    const pct = totalNodes > 0 ? Math.round((done / totalNodes) * 100) : 0;
+    document.getElementById('rop-fill').style.width = pct + '%';
+    document.getElementById('rop-pct-label').textContent = pct + '%';
+  }
+</script>
+{% endblock %}

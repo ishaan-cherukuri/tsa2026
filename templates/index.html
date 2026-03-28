@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %}STEMpathAI — Discover Your STEM Future{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      2026 &middot; Explore 7 High-Growth STEM Careers
+    </div>
+    <h1 class="hero-title">
+      Your Future in<br>
+      <span class="gradient-text">STEM Starts Here</span>
+    </h1>
+    <p class="hero-sub">
+      Take our 28-question career assessment — covering interests, personality,
+      and hypothetical scenarios — and get a personalized match score for every
+      STEM career, plus a complete roadmap from high school to your first job.
+    </p>
+    <div class="hero-actions">
+      <a href="{{ url_for('quiz') }}" class="btn-primary">
+        Find My Career Path
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <a href="{{ url_for('explore') }}" class="btn-ghost">Browse All Careers</a>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat-item">
+        <span class="stat-num">7</span>
+        <span class="stat-label">STEM Careers</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-num">28</span>
+        <span class="stat-label">Quiz Questions</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-num">$95K+</span>
+        <span class="stat-label">Avg. Starting Salary</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-num">36%</span>
+        <span class="stat-label">Peak Job Growth</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-orb" aria-hidden="true">
+    <div class="orb-ring r1"></div>
+    <div class="orb-ring r2"></div>
+    <div class="orb-ring r3"></div>
+    <div class="orb-core">◈</div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">How It Works</div>
+    <h2 class="section-title">Three Steps to Your <span class="gradient-text">STEM Future</span></h2>
+    <div class="steps-grid">
+      <div class="step-card" data-step="01">
+        <div class="step-icon-wrap" style="--c:#00d4ff">
+          <div class="step-icon-shape"></div>
+        </div>
+        <h3 class="step-title">Answer 28 Questions</h3>
+        <p class="step-desc">Work through subject preferences, personality questions, and real-world hypothetical scenarios designed to reveal your true STEM fit.</p>
+      </div>
+      <div class="step-card" data-step="02">
+        <div class="step-icon-wrap" style="--c:#8b5cf6">
+          <div class="step-icon-shape"></div>
+        </div>
+        <h3 class="step-title">Get Your Match Scores</h3>
+        <p class="step-desc">Our algorithm scores your answers against all 7 careers and displays a ranked list with a precise percentage match for each one.</p>
+      </div>
+      <div class="step-card" data-step="03">
+        <div class="step-icon-wrap" style="--c:#10b981">
+          <div class="step-icon-shape"></div>
+        </div>
+        <h3 class="step-title">Explore Your Roadmap</h3>
+        <p class="step-desc">Dive into detailed career pages covering HS prep, college links, professional skills, and a step-by-step pathway to your first job.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CAREER GRID -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">Explore Careers</div>
+    <h2 class="section-title">7 In-Demand <span class="gradient-text">STEM Careers</span></h2>
+    <p class="section-sub">Click any career to see the full pathway, required skills, college options, and entry-level jobs.</p>
+    <div class="careers-grid">
+      {% for career in careers.values() %}
+      <a href="{{ url_for('career', career_id=career.id) }}" class="career-card" style="--card-color:{{ career.color }}">
+        <div class="card-glow"></div>
+        <div class="card-color-bar" style="background: {{ career.gradient }}"></div>
+        <h3 class="card-title">{{ career.title }}</h3>
+        <div class="card-salary">{{ career.salary }}</div>
+        <div class="card-growth"><span class="growth-badge">{{ career.growth }} growth</span></div>
+        <p class="card-desc">{{ career.description[:130] }}...</p>
+        <div class="card-arrow">Explore Path &rarr;</div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section">
+  <div class="section-inner">
+    <div class="cta-banner">
+      <div class="cta-content">
+        <h2 class="cta-title">Ready to discover your <span class="gradient-text">STEM career match?</span></h2>
+        <p class="cta-sub">28 questions covering subject strengths, working style, personality, and real-world hypotheticals. Get a percentage score for every career.</p>
+        <a href="{{ url_for('quiz') }}" class="btn-primary btn-large">
+          Start the 28-Question Quiz
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+      <div class="cta-visual" aria-hidden="true">
+        <div class="cta-ring r1"></div>
+        <div class="cta-ring r2"></div>
+        <div class="cta-center">28Q</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
